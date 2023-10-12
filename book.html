@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <title>Book Management</title>
+</head>
+<body style="background-color: aqua;">
+    <div id="app" class="mx-auto max-w-7xl py-10 sm:px-6 lg:px-8">
+        <div class="flex flex-wrap my-5 -mx-2">
+            <div class="w-full lg:w-3/5 min-h-screen lg:p-10 flex flex-col h-[300px]">
+                <div class="w-full mt-14 px-8">
+                    <ul>
+                        <div class="w-full lg:w-4/5 shadow-lg lg:p-10 flex flex-col bg-white">
+                    
+                        <li v-for="(book, index) in books" :key="index" class="mb-4">
+                            <h3 class="text-lg font-semibold">{{ book.title }}</h3>
+                            <p>Author: {{ book.author }}</p>
+                            <p>Genre: {{ book.genre }}</p>
+                            <p>Price: {{ formatPrice(book.price) }}</p>
+                            <button @click="editBook(index)" class="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600">Edit</button>
+                            <button @click="removeBook(index)" class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600">Remove</button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="w-full lg:w-2/5 shadow-lg lg:p-10 flex flex-col bg-gray-200">
+                <div class="flex flex-row items-center justify-between px-5 mt-5 border-b-2">
+                    <div>
+                        <span class="font-bold text-xl text-black">Tambah data buku</span>
+                    </div>
+                </div>
+                <!-- Book Form -->
+                <div class="mt-4">
+                    <input v-model="newBook.title" class="mb-2 p-2" type="text" placeholder="Title ">
+                    |
+                    <input v-model="newBook.author" class="mb-2 p-2" type="text" placeholder="Author">
+                    <input v-model="newBook.genre" class="mb-2 p-2" type="text" placeholder="Genre">
+                    |
+                    <input v-model="newBook.price" class="mb-2 p-2" type="number" placeholder="Price">
+                    <button @click="addBook" class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">Add Book</button>
+                    <button @click="updateBook" class="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600" v-show="isEditing">Update</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp, ref } = Vue;
+
+        const app = createApp({
+            data() {
+                return {
+                    books: [
+                        {
+                            title: 'Harry Potter',
+                            author: 'JK Rowling',
+                            genre: 'Fiction',
+                            price: 200000,
+                        },
+                        {
+                            title: 'Bumi',
+                            author: 'Tere Liye',
+                            genre: 'Non-fiction',
+                            price: 75000,
+                        },
+                    ],
+                    newBook: {
+                        title: '',
+                        author: '',
+                        genre: '',
+                        price: 0,
+                    },
+                    isEditing: false, // Menandakan apakah sedang dalam mode edit
+                    editIndex: -1, 
+                };
+            },
+            methods: {
+                addBook() {
+                    if (this.newBook.title && this.newBook.author && this.newBook.genre && this.newBook.price > 0) {
+                        this.books.push({ ...this.newBook });
+                        this.newBook = {
+                            title: '',
+                            author: '',
+                            genre: '',
+                            price: 0,
+                        };
+                    }
+                },
+                removeBook(index) {
+                    this.books.splice(index, 1);
+                },
+                formatPrice(price) {
+                    const priceFloat = parseFloat(price);
+                    return priceFloat.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' });
+                },
+                editBook(index) {
+                this.isEditing = true;
+                this.editIndex = index;
+                this.newBook = { ...this.books[index] };
+            },
+            updateBook() {
+                if (this.newBook.title && this.newBook.author && this.newBook.genre && this.newBook.price > 0) {
+                    this.books[this.editIndex] = { ...this.newBook };
+                    this.isEditing = false;
+                    this.editIndex = -1;
+                    this.newBook = {
+                        title: '',
+                        author: '',
+                        genre: '',
+                        price: 0,
+                    };
+                }
+            },
+        },
+    });
+
+        app.mount('#app');
+    </script>
+</body>
+</html>
